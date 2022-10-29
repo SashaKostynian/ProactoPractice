@@ -1,0 +1,8 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+<!--    <event name="custom_button_press">-->
+<!--        <observer name="save_data_to_csv" instance="Practice\PracticePatterns\Observer\WriterCSV"/>-->
+<!--    </event>-->
+    <event name="practice_event_after">
+        <observer name="my_module_event_after_observer" instance="Practice\PracticePatterns\Observer\WriterCSV"/>
+    </event>
+</config>

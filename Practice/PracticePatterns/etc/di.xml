@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Practice\PracticePatterns\Api\ProductNameInterface" type="Practice\PracticePatterns\Model\ProductProperties"/>
+    <preference for="Practice\PracticePatterns\Api\ProductPriceInterface" type="Practice\PracticePatterns\Model\ProductProperties"/>
+</config>

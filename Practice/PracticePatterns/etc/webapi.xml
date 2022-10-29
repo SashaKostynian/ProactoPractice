@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../app/code/Magento/Webapi/etc/webapi.xsd">
+    <route url="/V1/patterns/product/name" method="POST">
+        <service class="Practice\PracticePatterns\Api\ProductNameInterface" method="getProductName" />
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/patterns/product/price" method="POST">
+        <service class="Practice\PracticePatterns\Api\ProductPriceInterface" method="getProductPrice" />
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+<!--    <route url="/V1/patterns/product/name" method="GET">-->
+<!--        <service class="Practice\PracticePatterns\Api\ProductNameInterface" method="getProductName" />-->
+<!--        <resources>-->
+<!--            <resource ref="anonymous"/>-->
+<!--        </resources>-->
+<!--    </route>-->
+</routes>
