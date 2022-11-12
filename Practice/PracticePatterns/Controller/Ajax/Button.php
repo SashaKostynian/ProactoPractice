@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Practice\PracticePatterns\Controller\Ajax;
 
-use Magecom\NovaPoshta\Model\AddressRepository;
-use Magento\Backend\Block\Template\Context;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Customer\Model\Session;
-use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Result\PageFactory;
 
-class Button extends \Magento\Framework\App\Action\Action
+class Button extends Action
 {
     private $resultPageFactory;
     private $customerSession;
     private $eventManager;
 
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
+        Context $context,
         PageFactory $resultPageFactory,
         Session $session,
         ManagerInterface $eventManager

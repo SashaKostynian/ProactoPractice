@@ -9,23 +9,27 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\View\Element\Template;
+use Magento\Catalog\Model\ResourceModel\Product\Collection\Proxy;
 
 class Products  extends Template
 {
     private $productCollectionFactory;
     private $customerSession;
     private $eventManager;
+    private $proxyCollection;
 
     public function __construct(
         Context $context,
         CollectionFactory $productCollectionFactory,
         Session $session,
+        Proxy $proxyCollection,
         ManagerInterface $eventManager,
         array $data = []
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->customerSession = $session;
         $this->eventManager = $eventManager;
+        $this->proxyCollection = $proxyCollection;
         parent::__construct($context, $data);
     }
 
@@ -36,21 +40,16 @@ class Products  extends Template
         if ($this->customerSession->isLoggedIn()) {
             $collection->setPageSize(3);
         } else {
-            $collection->setPageSize(6);
+            $collection->setPageSize(1);
         }
         return $collection;
     }
 
-    public function buttonPress()
-    {
-//        $this->eventManager->dispatch('practice_event_after');
+//    public function getProductProxyCollection()
+//    {
+//        $collection = $this->proxyCollection->addAttributeToSelect('*');
+//        $collection->setPageSize(10);
+//        return $collection;
+//    }
 
-//        file_put_contents('test.txt', 3);
-
-//        $this->eventManager->dispatch('practice_event_after', ['customer' => $this->customerSession->isLoggedIn() ?
-//            $this->customerSession->getCustomer()->getEmail() : "guest", 'time' => date("Y-m-d H:i:s", time())]);
-
-//        $this->eventManager->dispatch('custom_button_press', ['customer' => $this->customerSession->isLoggedIn() ?
-//            $this->customerSession->getCustomer()->getEmail() : "guest", 'time' => date("Y-m-d", time())]);
-    }
 }

@@ -1,6 +1,3 @@
-<?php
-$productCollection = $block->getProductCollection();
-?>
 
 <?php foreach ($block->getProductCollection() as $product): ?>
     <div class="product-data-show-main">
@@ -8,9 +5,16 @@ $productCollection = $block->getProductCollection();
     </div>
 <?php endforeach; ?>
 
+
 <div>
     <button id="save-to-csv" class="action tocart primary">
         <span>Save csv</span>
+    </button>
+</div>
+<br>
+<div>
+    <button id="proxy-load" class="action tocart primary">
+        <span>Add proxy products</span>
     </button>
 </div>
 
@@ -18,8 +22,6 @@ $productCollection = $block->getProductCollection();
     require(['jquery', 'mage/url', "mage/mage"], function($, url){
 
         $('#save-to-csv').click(function (element) {
-            console.log('pressed 77');
-
             $.ajax({
                 url: url.build('button/ajax/button'),
                 type: 'POST',
@@ -29,6 +31,22 @@ $productCollection = $block->getProductCollection();
                     contentType: 'application/json; charset=utf-8'
                 }
             })
-        })
+        });
+
+        $('#proxy-load').click(function (element) {
+            $.ajax({
+                url: url.build('button/ajax/proxy'),
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                params: {
+                    contentType: 'application/json; charset=utf-8'
+                },
+            }).then(function (response) {
+                $.each(response, function (entity_id, item) {
+                    $(".product-data-show-main").last().after('<div class="prd-name"><h2>'+item.name+'</h2></div>');
+                })
+            });
+        });
     });
 </script>
