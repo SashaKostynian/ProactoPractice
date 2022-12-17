@@ -3,7 +3,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job name="update_orders_db" instance="Practice\CustomDB\Cron\UpdateDB" method="execute">
-            <schedule>20 12 * * *</schedule>
+            <schedule>30 * * * *</schedule>
         </job>
     </group>
 </config>

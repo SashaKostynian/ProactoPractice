@@ -2,6 +2,7 @@
 namespace Practice\CustomDB\Cron;
 
 use Magento\Framework\App\ResourceConnection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Psr\Log\LoggerInterface;
 
 class UpdateDB
@@ -12,53 +13,29 @@ class UpdateDB
     private $logger;
 
     /**
-     * @var AddressRepository
-     */
-    public $addressRepository;
-
-    /**
-     * @var StreetFactory
-     */
-    public $streetFactory;
-
-    /**
-     * @var WarehouseFactory
-     */
-    public $warehouseFactory;
-
-    /**
-     * @var AddressManagementInterface
-     */
-    public $addressManagement;
-
-    /**
      * @var ResourceConnection
      */
-    protected $_resourceConnecton;
+    private $resourceConnecton;
+
+    /**
+     * @var CollectionFactory
+     */
+    private $orderCollectionFactory;
 
     /**
      * UpdateDB constructor.
      * @param LoggerInterface $logger
-     * @param AddressRepository $addressRepository
-     * @param StreetFactory $streetFactory
-     * @param WarehouseFactory $warehouseFactory
-     * @param AddressManagementInterface $addressManagement
      * @param ResourceConnection $resourceConnection
+     * @param CollectionFactory $orderCollectionFactory
      */
     public function __construct(
         LoggerInterface $logger,
-        AddressRepository $addressRepository,
-        StreetFactory $streetFactory,
-        WarehouseFactory $warehouseFactory,
-        AddressManagementInterface $addressManagement,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        CollectionFactory $orderCollectionFactory
     ) {
         $this->logger = $logger;
-        $this->addressRepository = $addressRepository;
-        $this->streetFactory = $streetFactory;
-        $this->warehouseFactory = $warehouseFactory;
-        $this->addressManagement = $addressManagement;
-        $this->_resourceConnecton = $resourceConnection;
+        $this->resourceConnecton = $resourceConnection;
+        $this->orderCollectionFactory = $orderCollectionFactory;
     }
 
     /**
@@ -66,50 +43,46 @@ class UpdateDB
      */
     public function execute()
     {
-        $this->logger->info('NP DB update started');
+        $this->logger->info('Orders DB update started');
 
-        $connection = $this->_resourceConnecton->getConnection();
-        $streetTable = $this->_resourceConnecton->getTableName('np_street');
-        $connection->truncateTable(
-            $streetTable
-        );
+        $connection = $this->resourceConnecton->getConnection('custom');
+        $orderTable = $connection->getTableName('order');
 
-        $warehouseTable = $this->_resourceConnecton->getTableName('np_warehouse');
-        $connection->truncateTable(
-            $warehouseTable
-        );
+        $orders = $this->getOrderCollection();
 
-        $warehouses = $_api->getWarehouses();
-        if ($warehouses['data']) {
-            foreach ($warehouses['data'] as $warehouse) {
-                $warehouseData = [
-                    "entity_id" => $connection->getAutoIncrementField($streetTable),
-                    'ref' => $warehouse['Ref'],
-                    'city_ref' => $warehouse['CityRef'],
-                    'warehouse_key' => $warehouse['SiteKey'],
-                    'description' => $warehouse['Description'],
-                    'description_ru' => $warehouse['DescriptionRu'],
-                    'type' => $warehouse['TypeOfWarehouse'],
-                    'number' => $warehouse['Number'],
-                    'short_address' => $warehouse['ShortAddress'],
-                    'short_address_ru' => $warehouse['ShortAddressRu'],
-                    'status' => $warehouse['WarehouseStatus'],
-                    'bicycle_parking' => $warehouse['BicycleParking'],
-                    'longitude' => $warehouse['Longitude'],
-                    'latitude' => $warehouse['Latitude'],
-                    'post_finance' => $warehouse['PostFinance'],
-                    'pos_terminal' => $warehouse['POSTerminal'],
-                    'international' => $warehouse['InternationalShipping'],
-                    'max_weight' => $warehouse['TotalMaxWeightAllowed'],
-                    'place_max_weight' => $warehouse['PlaceMaxWeightAllowed'],
-                    'reception_schedule' => json_encode($warehouse['Reception']),
-                    'delivery_schedule' => json_encode($warehouse['Delivery']),
-                    'work_schedule' => json_encode($warehouse['Schedule']),
-                    'site_key' => $warehouse['SiteKey']
-                ];
-                $connection->insertOnDuplicate($warehouseTable, $warehouseData);
-            }
+        foreach ($orders as $order) {
+            $connection->insertOnDuplicate($orderTable,
+                [
+                    'entity_id' => $connection->getAutoIncrementField('order'),
+                    'customer_id' => $order->getData('customer_id'),
+                    'address_id' => '22',
+                    'delivery_method' => $order->getData('shipping_description'),
+                    'delivery_price' => $order->getData('base_shipping_amount'),
+                    'payment_method' => '22',
+                    'total_price' => '22'
+                ]
+            );
         }
-        $this->logger->info('NP DB update finished');
+
+        $this->logger->info('Orders DB update finished');
     }
+
+    public function getOrderCollection()
+    {
+        $to = strtotime('-1 hours', strtotime(date("Y-m-d h:i:s")));
+        $from = strtotime('-2 hours', strtotime($to));
+        $from = date('Y-m-d h:i:s', $from);
+
+        $collection = $this->orderCollectionFactory->create()
+            ->addAttributeToSelect('*')
+            ->addFieldToFilter('created_at',
+                ['gteq' => $from]
+            )
+            ->addFieldToFilter('created_at',
+                ['lteq' => $to]
+            );
+
+        return $collection;
+    }
+
 }
